@@ -78,3 +78,11 @@ node tests/e2e.cjs <pasta-csv>     # teste de ponta a ponta no navegador (modo d
 ```
 
 O **modo demonstração** guarda os dados só no navegador (IndexedDB), útil para testar com suas planilhas antes de conectar o banco.
+
+
+## Cruzamento IOL × Rodeo × Inventário
+
+Em **Importar bases** envie, junto com as planilhas de IOL, a lista de envios do **Rodeo** e o **Inventário Geral** do FC (o tipo é detectado automaticamente).
+- Produto: FcSku (IOL) → Inventário (FNSKU/ASIN) → FN SKU do Rodeo. Contêiner: Container (IOL) = Scannable ID (Rodeo).
+- Tudo em **Crossdock** no Rodeo é tratado como setor **IXD**.
+- O Rodeo é sempre a foto mais recente; o Inventário é acumulativo. Tela: **IOL × Rodeo**.

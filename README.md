@@ -86,3 +86,6 @@ Em **Importar bases** envie, junto com as planilhas de IOL, a lista de envios do
 - Produto: FcSku (IOL) → Inventário (FNSKU/ASIN) → FN SKU do Rodeo. Contêiner: Container (IOL) = Scannable ID (Rodeo).
 - Tudo em **Crossdock** no Rodeo é tratado como setor **IXD**.
 - O Rodeo é sempre a foto mais recente; o Inventário é acumulativo. Tela: **IOL × Rodeo**.
+
+## Procurar (PROCV de itens perdidos)
+Aba "Procurar": cole contêineres, FcSkus ou ASINs, bipe com o coletor; localizado fica verde, com sinal sonoro para localizado e não localizado. Toda leitura é gravada em `procura_leituras` (imutável) para auditoria, com filtro por usuário e exportação CSV.

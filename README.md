@@ -89,3 +89,6 @@ Em **Importar bases** envie, junto com as planilhas de IOL, a lista de envios do
 
 ## Procurar (PROCV de itens perdidos)
 Aba "Procurar": cole contêineres, FcSkus ou ASINs, bipe com o coletor; localizado fica verde, com sinal sonoro para localizado e não localizado. Toda leitura é gravada em `procura_leituras` (imutável) para auditoria, com filtro por usuário e exportação CSV.
+
+## Justificar por planilha
+Aba "Justificar por planilha": baixe o modelo Excel (em branco ou já com os itens em IOL), preencha Motivo/Observação/Previsão/Setor que deve tratar e envie. O sistema valida linha a linha e mostra uma prévia antes de gravar. Uma cópia do modelo em branco está em `IOL_modelo_justificativas.xlsx`.

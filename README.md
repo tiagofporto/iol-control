@@ -92,3 +92,6 @@ Aba "Procurar": cole contêineres, FcSkus ou ASINs, bipe com o coletor; localiza
 
 ## Justificar por planilha
 Aba "Justificar por planilha": baixe o modelo Excel (em branco ou já com os itens em IOL), preencha Motivo/Observação/Previsão/Setor que deve tratar e envie. O sistema valida linha a linha e mostra uma prévia antes de gravar. Uma cópia do modelo em branco está em `IOL_modelo_justificativas.xlsx`.
+
+## Usuários e acessos
+Somente administradores importam bases, configuram o sistema e gerenciam usuários (tela Usuários: cadastro com senha provisória, liberação, perfil com setor/função/manager/foto, login). A função `admin-usuarios` (Edge Function) cria contas e redefine senhas. A presença mostra quem está online.

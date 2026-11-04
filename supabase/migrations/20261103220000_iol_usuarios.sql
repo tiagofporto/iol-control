@@ -34,9 +34,12 @@ set search_path = ''
 as $$
 begin
   -- sem usuário logado (função de administração com service role, SQL do painel) não há o que restringir
-  if (select auth.uid()) is not null and (select private.papel_atual()) is distinct from 'admin' then
-    if new.papel is distinct from old.papel or new.login is distinct from old.login or new.email is distinct from old.email then
-      raise exception 'Somente administradores alteram papel, login e e-mail.';
+  -- aninhado de propósito: o papel só é consultado quando há usuário logado (a service role não acessa o schema private)
+  if (select auth.uid()) is not null then
+    if (select private.papel_atual()) is distinct from 'admin' then
+      if new.papel is distinct from old.papel or new.login is distinct from old.login or new.email is distinct from old.email then
+        raise exception 'Somente administradores alteram papel, login e e-mail.';
+      end if;
     end if;
   end if;
   if old.papel = 'admin' and new.papel <> 'admin'

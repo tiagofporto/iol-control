@@ -1,6 +1,7 @@
 -- Rodeo: o recálculo dos vínculos estourava o tempo (504) com listas grandes (~28 mil linhas × ~36 mil itens em IOL).
 -- Causa: a CTE "l" era materializada (usada 2x) e o cruzamento por contêiner varria a lista inteira para cada item.
--- "not materialized" deixa o planejador usar o índice rodeo_linhas_scannable_idx.
+-- Além disso, logo após importar, a tabela ainda não tem estatísticas e o planejador escolhia laço aninhado (> 60 s);
+-- agora o cruzamento por contêiner é uma junção por hash.
 create or replace function public.iol_rodeo_recalcular()
 returns jsonb
 language plpgsql
@@ -11,6 +12,8 @@ declare
   v_imp  bigint;
   v_n    int;
 begin
+  -- logo após a importação a tabela ainda não tem estatísticas; junção por hash evita o plano em laço aninhado
+  perform set_config('enable_nestloop', 'off', true);
   select max(id) into v_imp from public.base_importacoes where tipo = 'rodeo' and status = 'concluida';
   delete from public.iol_rodeo_vinculo where true;
   if v_imp is null then
@@ -46,7 +49,7 @@ begin
   ),
   c_src as (
     -- linhas do mesmo contêiner; as que também casam por produto já estão contadas em a_src
-    select it.item_id,
+    select x.item_id,
            (count(*) filter (where x.extra))::int as linhas,
            coalesce(sum(x.quantidade) filter (where x.extra), 0)::int as un,
            array_agg(distinct x.destino) filter (where x.extra and x.destino is not null) as destinos,
@@ -55,13 +58,15 @@ begin
            max(x.dwell_horas) filter (where x.extra) as dw,
            coalesce(bool_or(x.ixd) filter (where x.extra), false) as ixd,
            true as cont, false as asn
-      from it
-      join lateral (
-        select l.*, (l.fn_sku is distinct from s.fnsku and l.fn_sku is distinct from s.asin) as extra
-          from l left join public.inventario_sku s on s.fcsku = it.sku
-         where l.scannable_id = it.container
-      ) x on it.container <> ''
-     group by it.item_id
+      from (
+        select it.item_id, l.destino, l.status, l.work_pool, l.quantidade, l.dwell_horas, l.ixd,
+               (l.fn_sku is distinct from s.fnsku and l.fn_sku is distinct from s.asin) as extra
+          from it
+          join l on l.scannable_id = it.container
+          left join public.inventario_sku s on s.fcsku = it.sku
+         where it.container <> ''
+      ) x
+     group by x.item_id
   ),
   src as (
     select * from a_src union all select * from c_src
